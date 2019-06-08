@@ -30,6 +30,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ButterKnife.bind(this);
+
+        rvPosts.setHasFixedSize(true);
+        rvPosts.setLayoutManager(new LinearLayoutManager(this));
+
         populateList();
     }
 
@@ -45,10 +50,5 @@ public class MainActivity extends AppCompatActivity {
                 rvPosts.setAdapter(adapter);
             }
         });
-
-        ButterKnife.bind(this);
-
-        rvPosts.setHasFixedSize(true);
-        rvPosts.setLayoutManager(new LinearLayoutManager(this));
     }
 }
