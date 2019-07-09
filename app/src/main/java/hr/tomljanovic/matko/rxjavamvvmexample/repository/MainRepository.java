@@ -27,4 +27,10 @@ public class MainRepository {
                 .getPosts()
                 .subscribeOn(Schedulers.io()));
     }
+
+    public LiveData<Post> makeSingleReactiveQuery(int id) {
+        return LiveDataReactiveStreams.fromPublisher(RetrofitAdapter.getRequestApi()
+                .getSinglePost(id)
+                .subscribeOn(Schedulers.io()));
+    }
 }

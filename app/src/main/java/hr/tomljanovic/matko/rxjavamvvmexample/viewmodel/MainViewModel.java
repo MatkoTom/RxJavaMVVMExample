@@ -18,4 +18,8 @@ public class MainViewModel extends ViewModel {
     public LiveData<List<Post>> makeQuery() {
         return repository.makeReactiveQuery();
     }
+
+    public LiveData<Post> makeSingleQuery(int id) {
+        return repository.makeSingleReactiveQuery(id);
+    }
 }

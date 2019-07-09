@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -16,11 +17,14 @@ import butterknife.ButterKnife;
 import hr.tomljanovic.matko.rxjavamvvmexample.adapter.PostAdapter;
 import hr.tomljanovic.matko.rxjavamvvmexample.model.Post;
 import hr.tomljanovic.matko.rxjavamvvmexample.viewmodel.MainViewModel;
+import io.reactivex.disposables.CompositeDisposable;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String TAG = "STASEDOGADJA";
+    public static final String TAG = "MainActivityLog";
+    private CompositeDisposable disposable = new CompositeDisposable();
+    private PostAdapter adapter;
 
     @BindView(R.id.rvPosts)
     RecyclerView rvPosts;
@@ -39,16 +43,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void populateList() {
-        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        viewModel.makeQuery().observe(this, new Observer<List<Post>>() {
+        MainViewModel viewModel = ViewModelProviders.of(MainActivity.this).get(MainViewModel.class);
+        viewModel.makeQuery().observe(MainActivity.this, new Observer<List<Post>>() {
             @Override
             public void onChanged(@Nullable List<Post> posts) {
-                Log.d(TAG, "onChanged: date response");
-                Log.d(TAG, "onChanged: " + posts);
-
-                PostAdapter adapter = new PostAdapter(posts, getApplicationContext());
+                adapter = new PostAdapter(posts, getApplicationContext());
                 rvPosts.setAdapter(adapter);
+                logItems();
             }
         });
     }
+
+    public void logItems() {
+        adapter.setListener(new AdapterCallback() {
+            @Override
+            public void onMethodCallback(int id) {
+                MainViewModel viewModel = ViewModelProviders.of(MainActivity.this).get(MainViewModel.class);
+                viewModel.makeSingleQuery(id).observe(MainActivity.this, new Observer<Post>() {
+                    @Override
+                    public void onChanged(@Nullable final Post post) {
+                        Log.d(TAG, "onChanged: data response");
+                        Log.d(TAG, "onChanged: " + post);
+                        Toast.makeText(MainActivity.this, post.getTitle(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        disposable.clear();
+    }
 }
+
+
+

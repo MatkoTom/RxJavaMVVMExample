@@ -6,10 +6,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
 
+import hr.tomljanovic.matko.rxjavamvvmexample.AdapterCallback;
 import hr.tomljanovic.matko.rxjavamvvmexample.R;
 import hr.tomljanovic.matko.rxjavamvvmexample.model.Post;
 
@@ -17,10 +19,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     private List<Post> postList;
     private Context context;
+    private AdapterCallback listener;
+
+    public PostAdapter() {
+    }
 
     public PostAdapter(List<Post> postList, Context context) {
         this.postList = postList;
         this.context = context;
+    }
+
+    public void setListener(AdapterCallback listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -35,6 +45,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         viewHolder.tvTitle.setText(postList.get(position).getTitle());
         viewHolder.tvBody.setText(new StringBuilder(postList.get(position).getBody().substring(0, 20)).append("..."));
         viewHolder.tvId.setText(String.valueOf(postList.get(position).getUserId()));
+
+        viewHolder.parentLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int id = postList.get(position).getId();
+                if (listener != null) {
+                    listener.onMethodCallback(id);
+                }
+            }
+        });
     }
 
     @Override
@@ -47,6 +67,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         TextView tvTitle;
         TextView tvBody;
         TextView tvId;
+        LinearLayout parentLayout;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -54,6 +75,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvBody = itemView.findViewById(R.id.tvBody);
             tvId = itemView.findViewById(R.id.tvId);
+            parentLayout = itemView.findViewById(R.id.parentLayout);
         }
     }
 }
